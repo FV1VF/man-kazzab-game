@@ -1,5 +1,4 @@
 name: Build APK
-
 on:
   workflow_dispatch:
 
@@ -17,20 +16,23 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: man-kazzab
         run: npm install
 
       - name: Add Android platform
+        working-directory: man-kazzab
         run: npx cap add android
 
       - name: Sync Capacitor
+        working-directory: man-kazzab
         run: npx cap sync android
 
       - name: Build APK
-        working-directory: android
+        working-directory: man-kazzab/android
         run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: man-kazzab-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: man-kazzab/android/app/build/outputs/apk/debug/appdebug.apk
