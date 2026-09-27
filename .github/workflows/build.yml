@@ -22,21 +22,36 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Extract project
+        run: |
+          ZIP_FILE=$(find . -maxdepth 2 -type f -name "*.zip" | head -n 1)
+          echo "ZIP_FILE=$ZIP_FILE"
+          unzip -o "$ZIP_FILE" -d extracted
+
+      - name: Find project files
+        run: |
+          PROJECT_DIR=$(find extracted -name package.json -type f -print -quit | xargs dirname)
+          echo "PROJECT_DIR=$PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
       - name: Install dependencies
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npm install
 
       - name: Add Android platform
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npx cap add android
 
       - name: Sync Capacitor
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npx cap sync android
 
       - name: Build APK
-        working-directory: android
+        working-directory: ${{ env.PROJECT_DIR }}/android
         run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: man-kazzab-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
