@@ -16,6 +16,18 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Extract project
+        run: unzip -o man-kazzab-project.zip
+
+      - name: Check project files
+        run: ls -la
+
       - name: Install dependencies
         run: npm install
 
@@ -27,7 +39,9 @@ jobs:
 
       - name: Build APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
